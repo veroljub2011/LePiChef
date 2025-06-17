@@ -23,9 +23,19 @@ function App() {
         setForm({ title: '', content: '' });
       });
   };
-
   return (
-    <div style={{ padding: 20 }}>
+    <div
+      style={{
+        padding: 20,
+        minHeight: '100vh',
+        backgroundImage: 'url("bg.jpg")',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backdropFilter: 'blur(5px)',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)'
+      }}
+    >
       <h1>LePiChef 🍽️</h1>
       <form onSubmit={handleSubmit}>
         <input
@@ -45,16 +55,18 @@ function App() {
           <li key={i}><b>{r.title}</b>: {r.content}</li>
         ))}
       </ul>
-    <footer style={{ marginTop: '50px', textAlign: 'center' }}>
-  <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '20px' }}>
-    Privacy Policy
-  </a>
-  <a href="/terms.html" target="_blank" rel="noopener noreferrer">
-    Terms of Use
-  </a>
-</footer>
-</div>
+      <footer style={{ marginTop: '50px', textAlign: 'center' }}>
+        <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '20px' }}>
+          Privacy Policy
+        </a>
+        <a href="/terms.html" target="_blank" rel="noopener noreferrer">
+          Terms of Use
+        </a>
+      </footer>
+    </div>
   );
 }
 
 export default App;
+
+  
