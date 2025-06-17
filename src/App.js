@@ -45,7 +45,15 @@ function App() {
           <li key={i}><b>{r.title}</b>: {r.content}</li>
         ))}
       </ul>
-    </div>
+    <footer style={{ marginTop: '50px', textAlign: 'center' }}>
+  <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '20px' }}>
+    Privacy Policy
+  </a>
+  <a href="/terms.html" target="_blank" rel="noopener noreferrer">
+    Terms of Use
+  </a>
+</footer>
+</div>
   );
 }
 
