@@ -28,7 +28,8 @@ function App() {
       style={{
         padding: 20,
         minHeight: '100vh',
-        backgroundImage: 'url("bg.jpg")',
+        backgroundImage: 'url("background.jpg")'
+,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
