@@ -49,6 +49,31 @@ function App() {
   />
 
   {/* Glavni sadržaj iznad pozadine */}
+ <div
+  style={{
+    position: 'relative',
+    minHeight: '100vh',
+    overflow: 'hidden',
+  }}
+>
+  {/* Pozadinska slika kao sloj pozadi */}
+  <div
+    style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: 'url("background.jpg")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'brightness(0.5) blur(1px)',
+      zIndex: 0,
+    }}
+  />
+
+  {/* Glavni sadržaj iznad pozadine */}
   <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
     <h1 style={{ color: 'white' }}>LePiChef 🍽️</h1>
 
