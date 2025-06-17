@@ -25,72 +25,74 @@ function App() {
   };
   return (
     <div
-      style={{
-        padding: 20,
-        minHeight: '100vh',
-        backgroundImage: 'url("background.jpg")'
-,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        backdropFilter: 'blur(5px)',
-        backgroundColor: 'rgba(255, 255, 255, 0.7)'
-      }}
-    >
-      <h1>LePiChef 🍽️</h1>
-      <form
-  onSubmit={handleSubmit}
   style={{
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    padding: '20px',
-    borderRadius: '12px',
-    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
-    backdropFilter: 'blur(8px)',
-    maxWidth: '400px',
-    margin: '20px auto',
+    position: 'relative',
+    minHeight: '100vh',
+    overflow: 'hidden',
   }}
 >
-  <input
-    placeholder="Naziv recepta"
-    value={form.title}
-    onChange={(e) => setForm({ ...form, title: e.target.value })}
+  {/* Pozadinska slika kao sloj pozadi */}
+  <div
     style={{
-      width: '100%',
-      padding: '10px',
-      marginBottom: '10px',
-      borderRadius: '8px',
-      border: '1px solid #ccc',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundImage: 'url("background.jpg")',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      filter: 'brightness(0.5) blur(1px)',
+      zIndex: 0,
     }}
   />
-  <br />
-  <textarea
-    placeholder="Opis recepta"
-    value={form.content}
-    onChange={(e) => setForm({ ...form, content: e.target.value })}
-    style={{
-      width: '100%',
-      padding: '10px',
-      marginBottom: '10px',
-      borderRadius: '8px',
-      border: '1px solid #ccc',
-      resize: 'vertical',
-    }}
-  />
-  <br />
-  <button
-    type="submit"
-    style={{
-      padding: '10px 20px',
-      borderRadius: '8px',
-      border: 'none',
-      backgroundColor: '#663399',
-      color: 'white',
-      cursor: 'pointer',
-      transition: 'transform 0.2s ease',
-    }}
-    onMouseOver={(e) => (e.target.style.transform = 'scale(1.05)')}
-    onMouseOut={(e) => (e.target.style.transform = 'scale(1.0)')}
-  >
-    Dodaj recept
-  </button>
-</form>
+
+  {/* Glavni sadržaj iznad pozadine */}
+  <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
+    <h1 style={{ color: 'white' }}>LePiChef 🍽️</h1>
+
+    <form onSubmit={handleSubmit}
+      style={{
+        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        padding: '20px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+        backdropFilter: 'blur(8px)',
+        maxWidth: '400px',
+        margin: '20px auto',
+      }}
+    >
+      <input
+        placeholder="Naziv recepta"
+        value={form.title}
+        onChange={e => setForm({ ...form, title: e.target.value })}
+        style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+      />
+      <br />
+      <textarea
+        placeholder="Opis recepta"
+        value={form.content}
+        onChange={e => setForm({ ...form, content: e.target.value })}
+        style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
+      />
+      <br />
+      <button type="submit">Dodaj recept</button>
+    </form>
+
+    <ul style={{ color: 'white' }}>
+      {recipes.map((r, i) => (
+        <li key={i}><b>{r.title}</b>: {r.content}</li>
+      ))}
+    </ul>
+
+    <footer style={{ marginTop: '30px', textAlign: 'center' }}>
+      <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '10px', color: 'white' }}>
+        Privacy Policy
+      </a>
+      <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}>
+        Terms of Use
+      </a>
+    </footer>
+  </div>
+</div>
