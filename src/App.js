@@ -5,58 +5,21 @@ function App() {
   const [recipes, setRecipes] = useState([]);
   const [bgIndex, setBgIndex] = useState(0);
 
-  // 7 background images
+  // Lista slika iz public foldera za slideshow
   const backgroundImages = [
-    'food1.jpg',
-    'food2.jpg',
-    'food3.jpg',
-    'food4.jpg',
-    'fruit1.jpg',
-    'fruit2.jpg',
-    'pork.jpg'
+    'cake1.jpg', 'cake2.jpg', 'cake3.jpg', 'cake4.jpg',
+    'food1.jpg', 'food2.jpg', 'food3.jpg'
   ];
 
-  // Region dishes data
-  const regionDishes = [
-    {
-      region: 'Asia',
-      name: 'Chicken Curry',
-      recipe: 'Combine chicken, onions, garlic, ginger, curry powder, tomatoes, simmer until tender.'
-    },
-    {
-      region: 'Europe',
-      name: 'Paella',
-      recipe: 'Sauté saffron rice with seafood, chicken, chorizo, peas, bell pepper, tomato.'
-    },
-    {
-      region: 'Africa',
-      name: 'Jollof Rice',
-      recipe: 'Cook rice in a spicy tomato-and-pepper base, with onions, garlic, ginger.'
-    },
-    {
-      region: 'North America',
-      name: 'Tacos',
-      recipe: 'Fill soft tortillas with seasoned meat, lettuce, cheese, salsa.'
-    },
-    {
-      region: 'South America',
-      name: 'Feijoada',
-      recipe: 'Stew black beans with pork, sausage, collard greens and orange slices.'
-    },
-    {
-      region: 'Oceania',
-      name: 'Pavlova',
-      recipe: 'Whisk egg whites and sugar into meringue, top with whipped cream and fruit.'
-    }
-  ];
-
+  // Slideshow pozadine - menja sliku na svakih 10 sekundi
   useEffect(() => {
     const interval = setInterval(() => {
       setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
-    }, 10000); // 10 sec
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
+  // Ucitavanje recepata
   useEffect(() => {
     fetch('http://localhost:5000/api/recipes')
       .then(res => res.json())
@@ -79,7 +42,7 @@ function App() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Background */}
+      {/* Pozadinska slika */}
       <div
         style={{
           position: 'absolute',
@@ -91,39 +54,43 @@ function App() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          filter: 'brightness(0.4)',
-          zIndex: 0
+          filter: 'brightness(0.5) blur(1px)',
+          zIndex: 0,
         }}
-      ></div>
+      />
 
-      {/* Foreground content */}
-      <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
-        <h1 style={{ color: 'white' }}>LePiChef 🍳</h1>
+      {/* Glavni sadrzaj */}
+      <div style={{ position: 'relative', zIndex: 1, padding: 20, color: 'white' }}>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          LePiChef
+          <img src="chef-logo.png" alt="Logo" style={{ height: '40px' }} />
+        </h1>
+
+        <p>Welcome to the recipe world of Pi Network</p>
 
         <form onSubmit={handleSubmit}
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
             padding: '20px',
             borderRadius: '12px',
             boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
             backdropFilter: 'blur(8px)',
             maxWidth: '400px',
-            margin: '20px auto'
+            margin: '20px auto',
+            color: 'black'
           }}>
           <input
             placeholder="Recipe Name"
             value={form.title}
             onChange={e => setForm({ ...form, title: e.target.value })}
             style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-          />
-          <br />
+          /><br />
           <textarea
             placeholder="Recipe Description"
             value={form.content}
             onChange={e => setForm({ ...form, content: e.target.value })}
             style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-          />
-          <br />
+          /><br />
           <button type="submit">Add Recipe</button>
         </form>
 
@@ -133,15 +100,17 @@ function App() {
           ))}
         </ul>
 
-        {/* Regional Dishes */}
-        <div style={{ marginTop: '40px', color: 'white', backgroundColor: 'rgba(0,0,0,0.4)', padding: '20px', borderRadius: '8px' }}>
-          <h2 style={{ textAlign: 'center' }}>🌎 Regional Dishes from Around the World</h2>
-          {regionDishes.map(d => (
-            <div key={d.region} style={{ marginBottom: '20px' }}>
-              <h3>{d.region}: <em>{d.name}</em></h3>
-              <p style={{ marginLeft: '10px' }}>{d.recipe}</p>
-            </div>
-          ))}
+        <div style={{ marginTop: '40px' }}>
+          <h2>World Regions and Signature Dishes</h2>
+          <ul>
+            <li><b>Asia:</b> Sushi - Vinegared rice with raw fish and vegetables.</li>
+            <li><b>Europe:</b> Pizza Margherita - Thin crust pizza with tomato, mozzarella, and basil.</li>
+            <li><b>Africa:</b> Jollof Rice - Rice cooked in spicy tomato sauce with vegetables and meat.</li>
+            <li><b>North America:</b> Cheeseburger - Grilled beef patty in a bun with cheese and toppings.</li>
+            <li><b>South America:</b> Empanadas - Pastries filled with meat, cheese, or vegetables.</li>
+            <li><b>Middle East:</b> Hummus - Chickpea and tahini spread served with pita bread.</li>
+            <li><b>Oceania:</b> Meat Pie - Savory pie filled with minced meat and gravy.</li>
+          </ul>
         </div>
 
         <footer style={{ marginTop: '30px', textAlign: 'center' }}>
