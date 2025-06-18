@@ -1,97 +1,47 @@
 import React, { useState, useEffect } from 'react';
 
+
 function App() {
-  const [form, setForm] = useState({ title: '', content: '' });
-  const [recipes, setRecipes] = useState([]);
+  // Ako su slike imenovane: food1.jpg, food2.jpg, ..., food30.jpg
+  const backgroundImages = Array.from({ length: 30 }, (_, i) => `food${i + 1}.jpg`);
+  const [bgIndex, setBgIndex] = useState(0);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/recipes')
-      .then(res => res.json())
-      .then(setRecipes);
+    const interval = setInterval(() => {
+      setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+    }, 10000); // 10000 ms = 10 sekundi
+
+    return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetch('http://localhost:5000/api/recipes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
-      .then(res => res.json())
-      .then(recipe => {
-        setRecipes([...recipes, recipe]);
-        setForm({ title: '', content: '' });
-      });
+  const backgroundStyle = {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundImage: `url(${process.env.PUBLIC_URL}/${backgroundImages[bgIndex]})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    filter: 'brightness(0.4) blur(1px)', // bledje i malo zamućeno
+    zIndex: -1,
+    transition: 'background-image 1s ease-in-out'
   };
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Tamna providna pozadina preko slike */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundImage: 'url("background.jpg")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          filter: 'brightness(0.5) blur(1px)',
-          zIndex: 0,
-        }}
-      />
+      <div style={backgroundStyle}></div>
 
-      {/* Glavni sadržaj iznad pozadine */}
-      <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
-        <h1 style={{ color: 'white' }}>LePiChef 👨‍🍳</h1>
-
-        <form onSubmit={handleSubmit}
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            padding: '20px',
-            borderRadius: '12px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
-            backdropFilter: 'blur(8px)',
-            maxWidth: '400px',
-            margin: '20px auto',
-          }}
-        >
-          <input
-            placeholder="Naziv recepta"
-            value={form.title}
-            onChange={e => setForm({ ...form, title: e.target.value })}
-            style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-          />
-          <br />
-          <textarea
-            placeholder="Opis recepta"
-            value={form.content}
-            onChange={e => setForm({ ...form, content: e.target.value })}
-            style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-          />
-          <br />
-          <button type="submit">Dodaj recept</button>
-        </form>
-
-        <ul style={{ color: 'white' }}>
-          {recipes.map((r, i) => (
-            <li key={i}><b>{r.title}</b>: {r.content}</li>
-          ))}
-        </ul>
-
-        <footer style={{ marginTop: '30px', textAlign: 'center' }}>
-          <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '10px', color: 'white' }}>
-            Privacy Policy
-          </a>
-          <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}>
-            Terms of Use
-          </a>
-        </footer>
+      {/* Glavni sadržaj aplikacije */}
+      <div style={{ position: 'relative', zIndex: 1, padding: '2rem', color: '#fff' }}>
+        <h1>LePiChef</h1>
+        <p>Welcome to the recipe world of Pi Network</p>
+        {/* Ovde idu tvoje forme, recepti itd. */}
       </div>
     </div>
   );
 }
 
 export default App;
+
