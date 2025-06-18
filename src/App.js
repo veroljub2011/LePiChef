@@ -5,21 +5,55 @@ function App() {
   const [recipes, setRecipes] = useState([]);
   const [bgIndex, setBgIndex] = useState(0);
 
+  // 7 background images
   const backgroundImages = [
-    'cake1.jpg',
-    'chicken.jpg',
-    'fish1.jpg',
     'food1.jpg',
+    'food2.jpg',
+    'food3.jpg',
+    'food4.jpg',
     'fruit1.jpg',
-    'pork.jpg',
-    'vegetables1.jpg'
+    'fruit2.jpg',
+    'pork.jpg'
   ];
 
-  // Slideshow pozadine (menja sliku na svakih 10 sekundi)
+  // Region dishes data
+  const regionDishes = [
+    {
+      region: 'Asia',
+      name: 'Chicken Curry',
+      recipe: 'Combine chicken, onions, garlic, ginger, curry powder, tomatoes, simmer until tender.'
+    },
+    {
+      region: 'Europe',
+      name: 'Paella',
+      recipe: 'Sauté saffron rice with seafood, chicken, chorizo, peas, bell pepper, tomato.'
+    },
+    {
+      region: 'Africa',
+      name: 'Jollof Rice',
+      recipe: 'Cook rice in a spicy tomato-and-pepper base, with onions, garlic, ginger.'
+    },
+    {
+      region: 'North America',
+      name: 'Tacos',
+      recipe: 'Fill soft tortillas with seasoned meat, lettuce, cheese, salsa.'
+    },
+    {
+      region: 'South America',
+      name: 'Feijoada',
+      recipe: 'Stew black beans with pork, sausage, collard greens and orange slices.'
+    },
+    {
+      region: 'Oceania',
+      name: 'Pavlova',
+      recipe: 'Whisk egg whites and sugar into meringue, top with whipped cream and fruit.'
+    }
+  ];
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setBgIndex((prev) => (prev + 1) % backgroundImages.length);
-    }, 10000);
+      setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+    }, 10000); // 10 sec
     return () => clearInterval(interval);
   }, []);
 
@@ -45,7 +79,7 @@ function App() {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Slika u pozadini */}
+      {/* Background */}
       <div
         style={{
           position: 'absolute',
@@ -57,27 +91,25 @@ function App() {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          filter: 'brightness(0.5)',
-          zIndex: 0,
+          filter: 'brightness(0.4)',
+          zIndex: 0
         }}
       ></div>
 
-      {/* Glavni sadržaj */}
-      <div style={{ position: 'relative', zIndex: 1, padding: '20px', textAlign: 'center', color: 'white' }}>
-        <h1>LePiChef 🍳</h1>
-        <p>Welcome to the recipe world of Pi Network</p>
+      {/* Foreground content */}
+      <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
+        <h1 style={{ color: 'white' }}>LePiChef 🍳</h1>
 
         <form onSubmit={handleSubmit}
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            backgroundColor: 'rgba(255, 255, 255, 0.9)',
             padding: '20px',
             borderRadius: '12px',
-            boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
+            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
             backdropFilter: 'blur(8px)',
             maxWidth: '400px',
             margin: '20px auto'
-          }}
-        >
+          }}>
           <input
             placeholder="Recipe Name"
             value={form.title}
@@ -100,6 +132,17 @@ function App() {
             <li key={i}><b>{r.title}</b>: {r.content}</li>
           ))}
         </ul>
+
+        {/* Regional Dishes */}
+        <div style={{ marginTop: '40px', color: 'white', backgroundColor: 'rgba(0,0,0,0.4)', padding: '20px', borderRadius: '8px' }}>
+          <h2 style={{ textAlign: 'center' }}>🌎 Regional Dishes from Around the World</h2>
+          {regionDishes.map(d => (
+            <div key={d.region} style={{ marginBottom: '20px' }}>
+              <h3>{d.region}: <em>{d.name}</em></h3>
+              <p style={{ marginLeft: '10px' }}>{d.recipe}</p>
+            </div>
+          ))}
+        </div>
 
         <footer style={{ marginTop: '30px', textAlign: 'center' }}>
           <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '10px', color: 'white' }}>
