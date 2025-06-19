@@ -2,86 +2,111 @@ import React, { useState, useEffect } from 'react';
 
 function App() {
   const [form, setForm] = useState({ title: '', content: '', image: null });
-  const [recipes, setRecipes] = useState([]);
   const [vegForm, setVegForm] = useState({ title: '', content: '', image: null });
   const [veganForm, setVeganForm] = useState({ title: '', content: '', image: null });
+  const [recipes, setRecipes] = useState([]);
   const [vegRecipes, setVegRecipes] = useState([]);
   const [veganRecipes, setVeganRecipes] = useState([]);
   const [bgIndex, setBgIndex] = useState(0);
-  const [fade, setFade] = useState(true);
 
   const backgroundImages = [
-    'food1.jpg', 'food2.jpg', 'food3.jpg',
-    'fruit1.jpg', 'fruit2.jpg', 'fruit3.jpg',
-    'pork.jpg'
+    'food1.jpg', 'food2.jpg', 'food3.jpg', 'cake1.jpg',
+    'fruit1.jpg', 'grill.jpg', 'pork.jpg'
   ];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setFade(false);
-      setTimeout(() => {
-        setBgIndex((prev) => (prev + 1) % backgroundImages.length);
-        setFade(true);
-      }, 500);
+      setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
     }, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = (e, type) => {
-    e.preventDefault();
-    const data = new FormData();
-    const currentForm = type === 'veg' ? vegForm : type === 'vegan' ? veganForm : form;
-    data.append('title', currentForm.title);
-    data.append('content', currentForm.content);
-    if (currentForm.image) data.append('image', currentForm.image);
+  useEffect(() => {
+    fetch('http://localhost:5000/api/recipes')
+      .then(res => res.json())
+      .then(data => {
+        setRecipes(data.recipes || []);
+        setVegRecipes(data.vegetarian || []);
+        setVeganRecipes(data.vegan || []);
+      });
+  }, []);
 
-    fetch(`http://localhost:5000/api/${type || 'recipes'}`, {
+  const handleSubmit = (e, type = 'recipes') => {
+    e.preventDefault();
+    const selectedForm = type === 'recipes' ? form : type === 'vegetarian' ? vegForm : veganForm;
+    const formData = new FormData();
+    formData.append('title', selectedForm.title);
+    formData.append('content', selectedForm.content);
+    if (selectedForm.image) {
+      formData.append('image', selectedForm.image);
+    }
+
+    fetch(`http://localhost:5000/api/${type}`, {
       method: 'POST',
-      body: data
+      body: formData
     })
       .then(res => res.json())
-      .then(recipe => {
-        if (type === 'veg') {
-          setVegRecipes([...vegRecipes, recipe]);
-          setVegForm({ title: '', content: '', image: null });
-        } else if (type === 'vegan') {
-          setVeganRecipes([...veganRecipes, recipe]);
-          setVeganForm({ title: '', content: '', image: null });
-        } else {
-          setRecipes([...recipes, recipe]);
+      .then(newRecipe => {
+        if (type === 'recipes') {
+          setRecipes([...recipes, newRecipe]);
           setForm({ title: '', content: '', image: null });
+        } else if (type === 'vegetarian') {
+          setVegRecipes([...vegRecipes, newRecipe]);
+          setVegForm({ title: '', content: '', image: null });
+        } else {
+          setVeganRecipes([...veganRecipes, newRecipe]);
+          setVeganForm({ title: '', content: '', image: null });
         }
       });
   };
 
-  const renderForm = (title, formData, setFormFunc, type = '') => (
-    <div style={{ backgroundColor: 'rgba(255, 248, 220, 0.85)', padding: '20px', borderRadius: '12px', marginBottom: '20px', maxWidth: '500px' }}>
-      {title && <h3 style={{ color: '#5C4033', textAlign: 'center' }}>{title}</h3>}
-      <form onSubmit={(e) => handleSubmit(e, type)}>
-        <input
-          placeholder="Recipe Name"
-          value={formData.title}
-          onChange={(e) => setFormFunc({ ...formData, title: e.target.value })}
-          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <br />
-        <textarea
-          placeholder="Recipe Description"
-          value={formData.content}
-          onChange={(e) => setFormFunc({ ...formData, content: e.target.value })}
-          style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-        />
-        <br />
-        <input
-          type="file"
-          onChange={(e) => setFormFunc({ ...formData, image: e.target.files[0] })}
-          style={{ marginBottom: '10px' }}
-        />
-        <br />
-        <button type="submit">Add Recipe</button>
-      </form>
+  const renderForm = (state, setState, typeLabel, typeKey) => (
+    <div style={formStyle}>
+      <h3>{typeLabel}</h3>
+      <input
+        placeholder="Recipe Name"
+        value={state.title}
+        onChange={(e) => setState({ ...state, title: e.target.value })}
+        style={inputStyle}
+      />
+      <textarea
+        placeholder="Recipe Description"
+        value={state.content}
+        onChange={(e) => setState({ ...state, content: e.target.value })}
+        style={textareaStyle}
+      />
+      <input
+        type="file"
+        onChange={(e) => setState({ ...state, image: e.target.files[0] })}
+        style={{ marginBottom: '10px' }}
+      />
+      <br />
+      <button onClick={(e) => handleSubmit(e, typeKey)}>Add Recipe</button>
     </div>
   );
+
+  const formStyle = {
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    padding: '20px',
+    borderRadius: '12px',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
+    backdropFilter: 'blur(8px)',
+    maxWidth: '400px',
+    margin: '20px auto'
+  };
+
+  const inputStyle = {
+    width: '100%',
+    marginBottom: '10px',
+    padding: '8px'
+  };
+
+  const textareaStyle = {
+    width: '100%',
+    marginBottom: '10px',
+    padding: '8px',
+    height: '100px'
+  };
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
@@ -91,40 +116,36 @@ function App() {
         backgroundImage: `url(${backgroundImages[bgIndex]})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        transition: 'opacity 0.5s ease-in-out',
-        opacity: fade ? 1 : 0,
+        backgroundRepeat: 'no-repeat',
+        filter: 'brightness(0.5) blur(1px)',
         zIndex: 0
-      }} />
+      }}></div>
 
       <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#5C4033' }}>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'white' }}>
           LePiChef
-          <img src="/logo.png" alt="LePiChef Logo" style={{ height: '40px' }} />
+          <img src="logo.png" alt="LePiChef Logo" style={{ height: '60px' }} />
         </h1>
-        <p style={{ color: '#333' }}>Welcome to the recipe world of Pi Network</p>
+        <p style={{ color: 'white' }}>Welcome to the recipe world of Pi Network</p>
 
-        {renderForm('', form, setForm)}
-        {renderForm('Vegetarian Recipe', vegForm, setVegForm, 'veg')}
-        {renderForm('Vegan Recipe', veganForm, setVeganForm, 'vegan')}
+        {renderForm(form, setForm, '', 'recipes')}
+        {renderForm(vegForm, setVegForm, 'Vegetarian Recipe', 'vegetarian')}
+        {renderForm(veganForm, setVeganForm, 'Vegan Recipe', 'vegan')}
 
-        <h2 style={{ color: '#333', marginTop: '40px' }}>World Regions and Signature Dishes</h2>
-        <ul style={{ color: '#333' }}>
-          <li><b>Asia:</b> Sushi – Vinegared rice with raw fish and vegetables.</li>
-          <li><b>Europe:</b> Pizza Margherita – Thin crust pizza with tomato, mozzarella, and basil.</li>
-          <li><b>Africa:</b> Jollof Rice – Spicy tomato rice with vegetables and meat.</li>
-          <li><b>North America:</b> Cheeseburger – Grilled beef patty in a bun with cheese.</li>
-          <li><b>South America:</b> Empanadas – Pastries filled with meat or vegetables.</li>
-          <li><b>Middle East:</b> Hummus – Chickpea and tahini spread served with pita.</li>
-          <li><b>Oceania:</b> Meat Pie – Savory pie filled with minced meat and gravy.</li>
+        <h2 style={{ color: 'white', marginTop: '40px' }}>World Regions and Signature Dishes</h2>
+        <ul style={{ color: 'white' }}>
+          <li><b>Asia:</b> Sushi - Vinegared rice with raw fish and vegetables.</li>
+          <li><b>Europe:</b> Pizza Margherita - Thin crust pizza with tomato, mozzarella, and basil.</li>
+          <li><b>Africa:</b> Jollof Rice - Spicy tomato rice with vegetables and meat.</li>
+          <li><b>North America:</b> Cheeseburger - Grilled beef patty with cheese and toppings.</li>
+          <li><b>South America:</b> Empanadas - Pastries filled with meat or vegetables.</li>
+          <li><b>Middle East:</b> Hummus - Chickpea and tahini spread with pita bread.</li>
+          <li><b>Oceania:</b> Meat Pie - Savory pie with minced meat and gravy.</li>
         </ul>
 
         <footer style={{ marginTop: '30px', textAlign: 'center' }}>
-          <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '10px', color: '#5C4033' }}>
-            Privacy Policy
-          </a>
-          <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={{ color: '#5C4033' }}>
-            Terms of Use
-          </a>
+          <a href="/privacy.html" target="_blank" style={{ color: 'white', marginRight: '10px' }}>Privacy Policy</a>
+          <a href="/terms.html" target="_blank" style={{ color: 'white' }}>Terms of Use</a>
         </footer>
       </div>
     </div>
