@@ -5,13 +5,13 @@ function App() {
   const [recipes, setRecipes] = useState([]);
   const [bgIndex, setBgIndex] = useState(0);
 
-  // Lista slika iz public foldera za slideshow
   const backgroundImages = [
-    'cake1.jpg', 'cake2.jpg', 'cake3.jpg', 'cake4.jpg',
-    'food1.jpg', 'food2.jpg', 'food3.jpg'
+    'food1.jpg', 'food2.jpg', 'food3.jpg',
+    'fruit1.jpg', 'fruit2.jpg', 'fruit3.jpg',
+    'cake1.jpg'
   ];
 
-  // Slideshow pozadine - menja sliku na svakih 10 sekundi
+  // Menjanje pozadine na svakih 10 sekundi
   useEffect(() => {
     const interval = setInterval(() => {
       setBgIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
@@ -60,37 +60,37 @@ function App() {
       />
 
       {/* Glavni sadrzaj */}
-      <div style={{ position: 'relative', zIndex: 1, padding: 20, color: 'white' }}>
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'white' }}>
           LePiChef
-          <img src="chef-logo.png" alt="Logo" style={{ height: '40px' }} />
+          <img src="/logo.png" alt="LePiChef Logo" style={{ height: '40px' }} />
         </h1>
 
-        <p>Welcome to the recipe world of Pi Network</p>
+        <p style={{ color: 'white' }}>Welcome to the recipe world of Pi Network</p>
 
-        <form onSubmit={handleSubmit}
-          style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.8)',
-            padding: '20px',
-            borderRadius: '12px',
-            boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
-            backdropFilter: 'blur(8px)',
-            maxWidth: '400px',
-            margin: '20px auto',
-            color: 'black'
-          }}>
+        <form onSubmit={handleSubmit} style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.8)',
+          padding: '20px',
+          borderRadius: '12px',
+          boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+          backdropFilter: 'blur(8px)',
+          maxWidth: '400px',
+          margin: '20px auto'
+        }}>
           <input
             placeholder="Recipe Name"
             value={form.title}
             onChange={e => setForm({ ...form, title: e.target.value })}
             style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-          /><br />
+          />
+          <br />
           <textarea
             placeholder="Recipe Description"
             value={form.content}
             onChange={e => setForm({ ...form, content: e.target.value })}
             style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-          /><br />
+          />
+          <br />
           <button type="submit">Add Recipe</button>
         </form>
 
@@ -100,7 +100,16 @@ function App() {
           ))}
         </ul>
 
-        <div style={{ marginTop: '40px' }}>
+        <footer style={{ marginTop: '30px', textAlign: 'center' }}>
+          <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '10px', color: 'white' }}>
+            Privacy Policy
+          </a>
+          <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}>
+            Terms of Use
+          </a>
+        </footer>
+
+        <section style={{ color: 'white', marginTop: '40px' }}>
           <h2>World Regions and Signature Dishes</h2>
           <ul>
             <li><b>Asia:</b> Sushi - Vinegared rice with raw fish and vegetables.</li>
@@ -111,16 +120,7 @@ function App() {
             <li><b>Middle East:</b> Hummus - Chickpea and tahini spread served with pita bread.</li>
             <li><b>Oceania:</b> Meat Pie - Savory pie filled with minced meat and gravy.</li>
           </ul>
-        </div>
-
-        <footer style={{ marginTop: '30px', textAlign: 'center' }}>
-          <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={{ marginRight: '10px', color: 'white' }}>
-            Privacy Policy
-          </a>
-          <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={{ color: 'white' }}>
-            Terms of Use
-          </a>
-        </footer>
+        </section>
       </div>
     </div>
   );
