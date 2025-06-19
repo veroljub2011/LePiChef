@@ -2,21 +2,12 @@ import React, { useState, useEffect } from 'react';
 
 function App() {
   const [form, setForm] = useState({ title: '', content: '', image: null });
-  const [vegetarianForm, setVegetarianForm] = useState({ title: '', content: '', image: null });
-  const [veganForm, setVeganForm] = useState({ title: '', content: '', image: null });
   const [recipes, setRecipes] = useState([]);
-  const [vegetarianRecipes, setVegetarianRecipes] = useState([]);
-  const [veganRecipes, setVeganRecipes] = useState([]);
   const [bgIndex, setBgIndex] = useState(0);
 
   const backgroundImages = [
-    'food1.jpg',
-    'food2.jpg',
-    'food3.jpg',
-    'food4.jpg',
-    'fruit1.jpg',
-    'fruit2.jpg',
-    'fruit3.jpg'
+    'food1.jpg', 'food2.jpg', 'food3.jpg', 'fruit1.jpg',
+    'pork.jpg', 'shrimp.jpg', 'vegetables2.jpg',
   ];
 
   useEffect(() => {
@@ -26,133 +17,155 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSubmit = (e, formType) => {
+  useEffect(() => {
+    fetch('http://localhost:5000/api/recipes')
+      .then((res) => res.json())
+      .then(setRecipes);
+  }, []);
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    let selectedForm, setSelectedRecipes;
-
-    if (formType === 'regular') {
-      selectedForm = form;
-      setSelectedRecipes = setRecipes;
-    } else if (formType === 'vegetarian') {
-      selectedForm = vegetarianForm;
-      setSelectedRecipes = setVegetarianRecipes;
-    } else {
-      selectedForm = veganForm;
-      setSelectedRecipes = setVeganRecipes;
-    }
-
-    const newRecipe = {
-      title: selectedForm.title,
-      content: selectedForm.content,
-      image: selectedForm.image ? URL.createObjectURL(selectedForm.image) : null
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const newRecipe = { ...form, image: reader.result };
+      fetch('http://localhost:5000/api/recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRecipe),
+      })
+        .then((res) => res.json())
+        .then((recipe) => {
+          setRecipes([...recipes, recipe]);
+          setForm({ title: '', content: '', image: null });
+        });
     };
-
-    setSelectedRecipes(prev => [...prev, newRecipe]);
-
-    if (formType === 'regular') setForm({ title: '', content: '', image: null });
-    if (formType === 'vegetarian') setVegetarianForm({ title: '', content: '', image: null });
-    if (formType === 'vegan') setVeganForm({ title: '', content: '', image: null });
+    if (form.image) {
+      reader.readAsDataURL(form.image);
+    } else {
+      const newRecipe = { ...form };
+      fetch('http://localhost:5000/api/recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRecipe),
+      })
+        .then((res) => res.json())
+        .then((recipe) => {
+          setRecipes([...recipes, recipe]);
+          setForm({ title: '', content: '', image: null });
+        });
+    }
   };
-
-  const renderForm = (formData, setFormData, formType, label) => (
-    <form onSubmit={(e) => handleSubmit(e, formType)} style={{
-      backgroundColor: 'rgba(255, 255, 255, 0.8)',
-      padding: '20px',
-      borderRadius: '12px',
-      boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
-      backdropFilter: 'blur(8px)',
-      maxWidth: '400px',
-      margin: '20px auto'
-    }}>
-      {label && <h3 style={{ textAlign: 'center', marginBottom: '10px' }}>{label}</h3>}
-      <input
-        placeholder="Recipe Name"
-        value={formData.title}
-        onChange={e => setFormData({ ...formData, title: e.target.value })}
-        style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-      />
-      <br />
-      <textarea
-        placeholder="Recipe Description"
-        value={formData.content}
-        onChange={e => setFormData({ ...formData, content: e.target.value })}
-        style={{ width: '100%', marginBottom: '10px', padding: '8px' }}
-      />
-      <br />
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
-        style={{ marginBottom: '10px' }}
-      />
-      <br />
-      <button type="submit">Add Recipe</button>
-    </form>
-  );
-
-  const renderRecipes = (recipesList) => (
-    <ul style={{ color: 'white', listStyleType: 'none', padding: 0 }}>
-      {recipesList.map((r, i) => (
-        <li key={i} style={{ marginBottom: '20px' }}>
-          <strong>{r.title}</strong>: {r.content}
-          {r.image && <div><img src={r.image} alt="recipe" style={{ width: '100%', maxWidth: '400px', marginTop: '10px', borderRadius: '10px' }} /></div>}
-        </li>
-      ))}
-    </ul>
-  );
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Background Image */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-        backgroundImage: `url("${backgroundImages[bgIndex]}")`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        filter: 'brightness(0.5) blur(1px)',
-        zIndex: 0
-      }} />
-
-      {/* Foreground Content */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundImage: `url(${backgroundImages[bgIndex]})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'brightness(0.5) blur(1px)',
+          zIndex: 0,
+        }}
+      />
       <div style={{ position: 'relative', zIndex: 1, padding: 20 }}>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'white' }}>
-          LePiChef <img src="chef-logo.png" alt="Logo" style={{ height: '40px' }} />
+          LePiChef
+          <img src="/logo.png" alt="LePiChef Logo" style={{ height: '40px' }} />
         </h1>
         <p style={{ color: 'white' }}>Welcome to the recipe world of Pi Network</p>
 
-        {renderForm(form, setForm, 'regular', '')}
-        {renderForm(vegetarianForm, setVegetarianForm, 'vegetarian', 'Vegetarian Recipe')}
-        {renderForm(veganForm, setVeganForm, 'vegan', 'Vegan Recipe')}
+        {/* Regular Recipe Form */}
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <input
+            placeholder="Recipe Name"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            style={inputStyle}
+          />
+          <textarea
+            placeholder="Recipe Description"
+            value={form.content}
+            onChange={(e) => setForm({ ...form, content: e.target.value })}
+            style={inputStyle}
+          />
+          <input
+            type="file"
+            onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+            style={{ marginBottom: '10px' }}
+          />
+          <button type="submit">Add Recipe</button>
+        </form>
 
-        <div style={{ display: 'flex', gap: '40px', justifyContent: 'center', flexWrap: 'wrap', color: 'white', marginTop: '40px' }}>
-          <div>
-            <h3>Recipes</h3>
-            {renderRecipes(recipes)}
-          </div>
-          <div>
-            <h3>Vegetarian Recipes</h3>
-            {renderRecipes(vegetarianRecipes)}
-          </div>
-          <div>
-            <h3>Vegan Recipes</h3>
-            {renderRecipes(veganRecipes)}
-          </div>
-        </div>
+        {/* Vegetarian Recipe Form */}
+        <h3 style={sectionTitle}>Vegetarian Recipe</h3>
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <input
+            placeholder="Recipe Name"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            style={inputStyle}
+          />
+          <textarea
+            placeholder="Recipe Description"
+            value={form.content}
+            onChange={(e) => setForm({ ...form, content: e.target.value })}
+            style={inputStyle}
+          />
+          <input
+            type="file"
+            onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+            style={{ marginBottom: '10px' }}
+          />
+          <button type="submit">Add Recipe</button>
+        </form>
+
+        {/* Vegan Recipe Form */}
+        <h3 style={sectionTitle}>Vegan Recipe</h3>
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <input
+            placeholder="Recipe Name"
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            style={inputStyle}
+          />
+          <textarea
+            placeholder="Recipe Description"
+            value={form.content}
+            onChange={(e) => setForm({ ...form, content: e.target.value })}
+            style={inputStyle}
+          />
+          <input
+            type="file"
+            onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
+            style={{ marginBottom: '10px' }}
+          />
+          <button type="submit">Add Recipe</button>
+        </form>
+
+        {/* Recipe Display */}
+        <ul style={{ color: 'white' }}>
+          {recipes.map((r, i) => (
+            <li key={i}>
+              <b>{r.title}</b>: {r.content}
+              {r.image && <div><img src={r.image} alt="recipe" style={{ maxWidth: '200px', marginTop: '10px' }} /></div>}
+            </li>
+          ))}
+        </ul>
 
         {/* Regional Dishes */}
-        <div style={{ color: 'white', marginTop: '40px' }}>
-          <h2>World Regions and Signature Dishes</h2>
-          <ul>
-            <li><b>Asia:</b> Sushi - Vinegared rice with raw fish and vegetables.</li>
-            <li><b>Europe:</b> Pizza Margherita - Thin crust pizza with tomato, mozzarella, and basil.</li>
-            <li><b>Africa:</b> Jollof Rice - Spicy tomato rice with vegetables and meat.</li>
-            <li><b>North America:</b> Cheeseburger - Grilled beef patty in a bun with cheese and toppings.</li>
-            <li><b>South America:</b> Empanadas - Pastries filled with meat or vegetables.</li>
-            <li><b>Middle East:</b> Hummus - Chickpea spread served with pita bread.</li>
-            <li><b>Oceania:</b> Meat Pie - Savory pie with minced meat and gravy.</li>
-          </ul>
-        </div>
+        <h2 style={{ color: 'white', marginTop: '40px' }}>World Regions and Signature Dishes</h2>
+        <ul style={{ color: 'white' }}>
+          <li><b>Asia:</b> <i>Sushi</i> – Vinegared rice with raw fish and vegetables.</li>
+          <li><b>Europe:</b> <i>Pizza Margherita</i> – Thin crust pizza with tomato, mozzarella, and basil.</li>
+          <li><b>Africa:</b> <i>Jollof Rice</i> – Spicy tomato rice with vegetables and meat.</li>
+          <li><b>North America:</b> <i>Cheeseburger</i> – Grilled beef patty with cheese and toppings.</li>
+          <li><b>South America:</b> <i>Empanadas</i> – Pastries filled with meat or vegetables.</li>
+          <li><b>Middle East:</b> <i>Hummus</i> – Chickpea spread with pita bread.</li>
+          <li><b>Oceania:</b> <i>Meat Pie</i> – Savory pie with minced meat and gravy.</li>
+        </ul>
 
         {/* Footer */}
         <footer style={{ marginTop: '30px', textAlign: 'center' }}>
@@ -167,5 +180,27 @@ function App() {
     </div>
   );
 }
+
+const formStyle = {
+  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+  padding: '20px',
+  borderRadius: '12px',
+  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+  backdropFilter: 'blur(8px)',
+  maxWidth: '400px',
+  margin: '20px auto',
+};
+
+const inputStyle = {
+  width: '100%',
+  marginBottom: '10px',
+  padding: '8px',
+};
+
+const sectionTitle = {
+  color: 'white',
+  textAlign: 'center',
+  marginTop: '40px',
+};
 
 export default App;
